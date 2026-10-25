@@ -16,6 +16,10 @@ CHURN_DAYS = 90
 df = pd.read_excel(SOURCE)
 df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
 df = df.rename(columns={'invoicedate': 'invoice_date', 'unitprice': 'unit_price', 'customerid': 'customer_id', 'invoiceno': 'invoice_no'})
+required_columns = {'invoice_date', 'customer_id', 'invoice_no', 'quantity', 'unit_price', 'country'}
+missing_columns = sorted(required_columns - set(df.columns))
+if missing_columns:
+    raise ValueError(f"Input workbook is missing required columns: {', '.join(missing_columns)}")
 df['invoice_date'] = pd.to_datetime(df['invoice_date'], errors='coerce')
 df['customer_id'] = pd.to_numeric(df['customer_id'], errors='coerce')
 df = df.drop_duplicates()
