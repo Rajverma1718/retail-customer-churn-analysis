@@ -22,10 +22,14 @@ if missing_columns:
     raise ValueError(f"Input workbook is missing required columns: {', '.join(missing_columns)}")
 df['invoice_date'] = pd.to_datetime(df['invoice_date'], errors='coerce')
 df['customer_id'] = pd.to_numeric(df['customer_id'], errors='coerce')
+for column in ('quantity', 'unit_price'):
+    df[column] = pd.to_numeric(df[column], errors='coerce')
 df = df.drop_duplicates()
 df = df[df['customer_id'].notna() & df['invoice_date'].notna()]
 df = df[~df['invoice_no'].astype(str).str.startswith('C')]
 df = df[(df['quantity'] > 0) & (df['unit_price'] > 0)].copy()
+if df.empty:
+    raise ValueError('No valid transactions remain after cleaning the input workbook')
 df['revenue'] = df['quantity'] * df['unit_price']
 
 analysis_date = df['invoice_date'].max()
