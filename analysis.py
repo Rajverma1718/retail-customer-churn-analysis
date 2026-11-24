@@ -26,7 +26,7 @@ for column in ('quantity', 'unit_price'):
     df[column] = pd.to_numeric(df[column], errors='coerce')
 df = df.drop_duplicates()
 df = df[df['customer_id'].notna() & df['invoice_date'].notna()]
-df = df[~df['invoice_no'].astype(str).str.startswith('C')]
+df = df[~df['invoice_no'].astype(str).str.strip().str.upper().str.startswith('C')]
 df = df[(df['quantity'] > 0) & (df['unit_price'] > 0)].copy()
 if df.empty:
     raise ValueError('No valid transactions remain after cleaning the input workbook')
